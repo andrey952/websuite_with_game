@@ -1,0 +1,40 @@
+services:
+  app:
+    build: .
+    restart: always
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      - "8443:8443"
+    volumes:
+      - ./certs/:/app/certs/
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      SERVER_SSL_ENABLED: true
+      SERVER_PORT: 8443
+      SERVER_SSL_KEY_STORE: classpath:/certs/server.jks
+      SERVER_SSL_KEY_STORE_TYPE: JKS
+      SERVER_SSL_KEY_STORE_PASSWORD: changeit
+      SERVER_SSL_KEY_ALIAS: server
+    healthcheck:
+      test: ["CMD", "sh", "-c", "curl --insecure --fail https://localhost:8443 || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 30
+
+  mysql:
+    container_name: guide-mysql
+    image: mysql:latest
+    environment:
+      MYSQL_DATABASE: mydatabase
+      MYSQL_PASSWORD: secret
+      MYSQL_ROOT_PASSWORD: verysecret
+      MYSQL_USER: myuser
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pverysecret"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
