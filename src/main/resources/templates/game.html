@@ -3,40 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <title>Камень-Ножницы-Бумага</title>
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
+        /* Основные стили */
         body {
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
+            height: 100vh;
             background-color: #fafafa;
         }
 
-        .buttons-container {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
         button {
-            width: 150px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: all 0.2s ease-in-out;
+            cursor: pointer;
+            transition: transform 0.2s ease-in-out;
         }
 
         button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+            transform: scale(1.1); /* Немного увеличиваем размер при наведении */
         }
 
-        h2 {
-            font-size: 24px;
-            line-height: 1.5;
-        }
-
-        span {
+        div#results {
+            margin-top: 30px;
             font-weight: bold;
         }
     </style>
@@ -48,15 +37,15 @@
     <!-- Формы для выбора -->
     <div class="buttons-container">
         <form action="/game/play" method="get">
-            <input type="hidden" name="choice" value="rock" />
+            <input type="hidden" name="choice" value="rock"/>
             <button type="submit" class="btn btn-outline-dark">🧱 Камень</button>
         </form>
         <form action="/game/play" method="get">
-            <input type="hidden" name="choice" value="paper" />
+            <input type="hidden" name="choice" value="paper"/>
             <button type="submit" class="btn btn-outline-dark">📄 Бумага</button>
         </form>
         <form action="/game/play" method="get">
-            <input type="hidden" name="choice" value="scissors" />
+            <input type="hidden" name="choice" value="scissors"/>
             <button type="submit" class="btn btn-outline-dark">✂ Ножницы</button>
         </form>
     </div>
@@ -67,6 +56,84 @@
         <h2>Компьютер выбрал: <span th:text="${computerChoice}"></span></h2>
         <h2>Результат: <span th:text="${result}"></span></h2>
     </div>
+
+    <!-- Таблица статистики -->
+    <div id="score" data-score='{"wins": "${score.wins}", "losses": "${score.losses}", "ties": "${score.ties}"}'></div>
+    <table class="table mt-4">
+        <thead>
+        <tr>
+            <th scope="col">Победы</th>
+            <th scope="col">Поражения</th>
+            <th scope="col">Ничьи</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td th:text="${score.wins ?: 0}"></td>
+            <td th:text="${score.losses ?: 0}"></td>
+            <td th:text="${score.ties ?: 0}"></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <!-- Канвас для графика -->
+    <canvas id="statsChart" width="400" height="200"></canvas>
+
+    <!-- Кнопка назад -->
+    <a href="/" class="btn btn-secondary mb-3">Назад</a>
+
+    <!-- Кнопка сброса счёта -->
+    <form action="/game/reset" method="post">
+        <button type="submit" class="btn btn-danger">Сбросить счёт</button>
+    </form>
 </div>
+
+<!-- Скрипт для подключения библиотеки Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    // Рисуем график единожды, без привязки к событию submit
+    function drawStatsChart() {
+        const ctx = document.getElementById('statsChart').getContext('2d');
+        const score = JSON.parse(document.querySelector('#score').dataset.score);
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Победы', 'Поражения', 'Ничьи'],
+                datasets: [{
+                    label: 'Статистика',
+                    data: [score.wins, score.losses, score.ties],
+                    backgroundColor: [
+                        '#4CAF50', // Зелёный цвет для побед
+                        '#FF5733', // Красный цвет для поражений
+                        '#FFC300'  // Жёлтый цвет для ничьих
+                    ]
+                }]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }]
+                }
+            }
+        });
+    }
+
+    // Функция вызывается только однажды при загрузке страницы
+    drawStatsChart();
+
+    // Обработчик форм для обновления графика после отправки формы
+    document.querySelectorAll('.buttons-container form').forEach(form => {
+        form.addEventListener('submit', async () => {
+            await fetch('/game/play?' + new URLSearchParams(new FormData(form)));
+            location.reload(); // Перезагрузка страницы для обновления данных
+        });
+    });
+</script>
+
 </body>
 </html>
