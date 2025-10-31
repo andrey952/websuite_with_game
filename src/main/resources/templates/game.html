@@ -5,6 +5,7 @@
     <title>Камень-Ножницы-Бумага</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Подключаем Chart.js -->
     <style>
         /* Основные стили */
         body {
@@ -31,6 +32,9 @@
     </style>
 </head>
 <body>
+
+
+
 <div class="container">
     <h1 class="mb-4">Игра "Камень-Ножницы-Бумага"</h1>
 
@@ -76,8 +80,7 @@
         </tbody>
     </table>
 
-    <!-- Канвас для графика -->
-    <canvas id="statsChart" width="400" height="200"></canvas>
+
 
     <!-- Кнопка назад -->
     <a href="/" class="btn btn-secondary mb-3">Назад</a>
@@ -88,52 +91,61 @@
     </form>
 </div>
 
-<!-- Скрипт для подключения библиотеки Chart.js -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- Канвас для графика -->
+<canvas id="statsChart" width="10" height="10"></canvas>
 
 <script>
-    // Рисуем график единожды, без привязки к событию submit
-    function drawStatsChart() {
-        const ctx = document.getElementById('statsChart').getContext('2d');
-        const score = JSON.parse(document.querySelector('#score').dataset.score);
+    document.addEventListener("DOMContentLoaded", function() {
+        // Функция для рисования графика
+        function drawStatsChart() {
+            // Ищем канвас, куда будем рисовать график
+            const ctx = document.getElementById('statsChart').getContext('2d');
 
-        new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: ['Победы', 'Поражения', 'Ничьи'],
-                datasets: [{
-                    label: 'Статистика',
-                    data: [score.wins, score.losses, score.ties],
-                    backgroundColor: [
-                        '#4CAF50', // Зелёный цвет для побед
-                        '#FF5733', // Красный цвет для поражений
-                        '#FFC300'  // Жёлтый цвет для ничьих
-                    ]
-                }]
-            },
-            options: {
-                scales: {
-                    yAxes: [{
-                        ticks: {
-                            beginAtZero: true
-                        }
+            // Извлекаем данные из таблицы
+            const winsCell = document.querySelector('table tbody tr td:nth-child(1)');
+            const lossesCell = document.querySelector('table tbody tr td:nth-child(2)');
+            const tiesCell = document.querySelector('table tbody tr td:nth-child(3)');
+
+            // Преобразуем извлечённые значения в числа
+            const wins = Number(winsCell.textContent.trim());
+            const losses = Number(lossesCell.textContent.trim());
+            const ties = Number(tiesCell.textContent.trim());
+
+            // Готовим массив данных для графика
+            const dataArray = [wins, losses, ties];
+
+            // Строим график
+            new Chart(ctx, {
+                type: 'bar', // Столбчатый график
+                data: {
+                    labels: ['Победы', 'Поражения', 'Ничьи'], // Метки по оси X
+                    datasets: [{
+                        label: 'Игровая статистика', // Заголовок данных
+                        data: dataArray, // Сами данные
+                        backgroundColor: [
+                            'rgba(75, 192, 192, 0.6)', // Зеленый цвет для побед
+                            'rgba(255, 99, 132, 0.6)', // Красный цвет для поражений
+                            'rgba(255, 206, 86, 0.6)'  // Желтый цвет для ничьих
+                        ],
+                        borderWidth: 1
                     }]
+                },
+                options: {
+
+                    maintainAspectRatio: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true // Начальная точка шкалы Y равна нулю
+                        }
+                    }
                 }
-            }
-        });
-    }
+            }); // <-- Эта закрывающая скобка была пропущена ранее
+        }
 
-    // Функция вызывается только однажды при загрузке страницы
-    drawStatsChart();
-
-    // Обработчик форм для обновления графика после отправки формы
-    document.querySelectorAll('.buttons-container form').forEach(form => {
-        form.addEventListener('submit', async () => {
-            await fetch('/game/play?' + new URLSearchParams(new FormData(form)));
-            location.reload(); // Перезагрузка страницы для обновления данных
-        });
+        // Вызываем функцию рисования графика при загрузке страницы
+        drawStatsChart();
     });
 </script>
-
 </body>
 </html>
