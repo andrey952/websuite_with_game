@@ -9,12 +9,35 @@
     /* Основные стили */
     body {
       display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
       min-height: 100vh;
-      background-color: #fafafa;
+      background-color: #ecf0f1; /* Серый боковой фон */
+      margin: 0;
+      padding: 0;
     }
 
+    /* Центральная зона */
+    .central-area {
+      width: 90%; /* Наша ширина уменьшена до 90% */
+      height: calc(100vh - 60px); /* Высота страницы минус панель */
+      background-color: #ffffff; /* Белый фон для центра */
+      padding: 20px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1); /* Тень вокруг */
+      border-radius: 10px; /* Округлые углы */
+      margin-top: 60px; /* Пространство под панелью */
+    }
+
+    /* Приветственный текст */
+    .welcome-message {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 1.2em;
+      color: #333;
+    }
+
+    /* Карточка игры */
     .card {
       width: 300px;
       box-shadow: 0 4px 8px rgba(0,0,0,.1);
@@ -24,7 +47,7 @@
     }
 
     .card:hover {
-      transform: scale(1.05); /* Легкий эффект увеличения при наведении */
+      transform: scale(1.05); /* Увеличение при наведении */
     }
 
     img.card-img-top {
@@ -58,22 +81,122 @@
     a.btn-primary:hover {
       background-color: #0056b3;
     }
+
+    /* Верхняя панель */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      background-color: #3498db; /* Ярко-голубой фон */
+      color: white;
+      padding: 10px 0;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .tab-button {
+      flex-grow: 1;
+      text-align: center;
+      padding: 10px 20px;
+      border: none;
+      outline: none;
+      cursor: pointer;
+      transition: background-color 0.3s ease-in-out;
+      color: white;
+      font-weight: bold;
+      letter-spacing: 1px;
+      background-color: inherit; /* Наследование фона */
+    }
+
+    .tab-button.active,
+    .tab-button:hover {
+      background-color: rgba(255, 255, 255, 0.1); /* Полупрозрачная подсветка */
+    }
+
+    section {
+      display: none;
+      padding: 20px;
+      animation: fadeIn 0.5s forwards; /* Анимация появления */
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    /* Показываем активную секцию */
+    section.active {
+      display: block;
+    }
   </style>
 </head>
 <body>
-<div class="container d-flex justify-content-center">
-  <div class="row">
-    <div class="col-md-4">
-      <div class="card mb-3">
-        <img th:src="@{'/images/rsp.png'}" alt="Игра Камень-Ножницы-Бумага" class="card-img-top"/>
-        <div class="card-body">
-          <h5 class="card-title">Камень-Ножницы-Бумага</h5>
-          <p class="card-text">Классическая игра против компьютера.</p>
-          <a href="/game/" class="btn btn-primary">Играть</a>
+
+<!-- Навигационная панель -->
+<nav>
+  <button class="tab-button active" onclick="showSection('home')">Главная</button>
+  <button class="tab-button" onclick="showSection('about')">Об авторе</button>
+</nav>
+
+<!-- Центральная область -->
+<div class="central-area">
+
+  <!-- Раздел 'Главная' -->
+  <section id="home" class="active">
+    <div class="container d-flex justify-content-center">
+      <div class="row">
+        <div class="col-md-12"> <!-- Используем всю ширину строки -->
+
+          <!-- Приветственный текст -->
+          <div class="welcome-message">
+            Добро пожаловать!<br />
+            Здесь вы можете поиграть в классические игры и весело провести время.<br />
+            Выберите интересующую вас игру и начните играть прямо сейчас!
+          </div>
+
+          <!-- Карточка игры -->
+          <div class="card mb-3">
+            <img th:src="@{'/images/rsp.png'}" alt="Игра Камень-Ножницы-Бумага" class="card-img-top"/>
+            <div class="card-body">
+              <h5 class="card-title">Камень-Ножницы-Бумага</h5>
+              <p class="card-text">Классическая игра против компьютера.</p>
+              <a href="/game/" class="btn btn-primary">Играть</a>
+            </div>
+          </div>
+
         </div>
       </div>
     </div>
-  </div>
+  </section>
+
+  <!-- Раздел 'Об авторе' -->
+  <section id="about">
+    <h1 style="color:#333;">Об авторе</h1>
+    <p>Проект разработан Иваном Петровым. Мне нравится создавать интересные приложения и делиться ими с окружающими.</p>
+  </section>
+
 </div>
+
+<script>
+  // Функция для показа нужной секции и скрытия остальных
+  function showSection(sectionId) {
+    // Получаем все кнопки и секции
+    const buttons = document.querySelectorAll('.tab-button');
+    const sections = document.querySelectorAll('section');
+
+    // Удаляем класс active у всех кнопок и секций
+    buttons.forEach(button => button.classList.remove('active'));
+    sections.forEach(sec => sec.classList.remove('active'));
+
+    // Активируем выбранную кнопку и соответствующую ей секцию
+    document.getElementById(sectionId).classList.add('active');
+    document.querySelector(`button[onclick*="${sectionId}"]`).classList.add('active');
+  }
+</script>
+
 </body>
 </html>
