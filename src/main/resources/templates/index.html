@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <title>Игры онлайн</title>
-  <!-- Подключение Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
     /* Основные стили */
@@ -20,13 +19,13 @@
 
     /* Центральная зона */
     .central-area {
-      width: 90%; /* Наша ширина уменьшена до 90% */
-      height: calc(100vh - 60px); /* Высота страницы минус панель */
-      background-color: #ffffff; /* Белый фон для центра */
+      width: 90%;
+      height: calc(100vh - 60px);
+      background-color: #ffffff;
       padding: 20px;
-      box-shadow: 0 10px 20px rgba(0,0,0,0.1); /* Тень вокруг */
-      border-radius: 10px; /* Округлые углы */
-      margin-top: 60px; /* Пространство под панелью */
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+      border-radius: 10px;
+      margin-top: 60px;
     }
 
     /* Приветственный текст */
@@ -37,13 +36,20 @@
       color: #333;
     }
 
-    /* Карточка игры */
+    /* Новая структура карточек */
     .card {
-      width: 300px;
+      max-width: 300px; /* Максимальная ширина */
+      height: 400px; /* Фиксированная высота */
       box-shadow: 0 4px 8px rgba(0,0,0,.1);
       border-radius: 1rem;
       overflow: hidden;
       transition: transform .3s ease-in-out;
+    }
+
+    .position-absolute.bottom-0.start-0 {
+      bottom: 0; /* Прикрепляем к низу */
+      left: 0; /* Слева */
+      padding: 10px; /* Небольшой внутренний отступ */
     }
 
     .card:hover {
@@ -52,7 +58,7 @@
 
     img.card-img-top {
       object-fit: cover;
-      height: 200px;
+      height: 200px; /* Фиксированная высота изображения */
     }
 
     h5.card-title {
@@ -89,7 +95,7 @@
       left: 0;
       right: 0;
       z-index: 1000;
-      background-color: #3498db; /* Ярко-голубой фон */
+      background-color: #3498db;
       color: white;
       padding: 10px 0;
       width: 100%;
@@ -109,18 +115,18 @@
       color: white;
       font-weight: bold;
       letter-spacing: 1px;
-      background-color: inherit; /* Наследование фона */
+      background-color: inherit;
     }
 
     .tab-button.active,
     .tab-button:hover {
-      background-color: rgba(255, 255, 255, 0.1); /* Полупрозрачная подсветка */
+      background-color: rgba(255, 255, 255, 0.1);
     }
 
     section {
       display: none;
       padding: 20px;
-      animation: fadeIn 0.5s forwards; /* Анимация появления */
+      animation: fadeIn 0.5s forwards;
     }
 
     @keyframes fadeIn {
@@ -128,7 +134,6 @@
       to   { opacity: 1; }
     }
 
-    /* Показываем активную секцию */
     section.active {
       display: block;
     }
@@ -159,15 +164,32 @@
           </div>
 
           <!-- Карточка игры -->
-          <div class="card mb-3">
-            <img th:src="@{'/images/rsp.png'}" alt="Игра Камень-Ножницы-Бумага" class="card-img-top"/>
-            <div class="card-body">
-              <h5 class="card-title">Камень-Ножницы-Бумага</h5>
-              <p class="card-text">Классическая игра против компьютера.</p>
-              <a href="/game/" class="btn btn-primary">Играть</a>
+          <div class="row">
+            <div class="col-md-6"> <!-- Левая карточка -->
+              <div class="card mb-3 position-relative">
+                <img th:src="@{'/images/rsp.png'}" alt="Игра Камень-Ножницы-Бумага" class="card-img-top"/>
+                <div class="card-body">
+                  <h5 class="card-title">Камень-Ножницы-Бумага</h5>
+                  <p class="card-text">Классическая игра против компьютера.</p>
+                </div>
+                <div class="position-absolute bottom-0 start-0 p-3"> <!-- Абсолютное позиционирование -->
+                  <a href="/game/" class="btn btn-primary">Играть</a>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6"> <!-- Правая карточка -->
+              <div class="card mb-3 position-relative">
+                <img th:src="@{'/images/ninja-run.png'}" alt="Ninja Run Game" class="card-img-top"/>
+                <div class="card-body">
+                  <h5 class="card-title">Ninja Run</h5>
+                  <p class="card-text">Простая игра-платформер с черепашками-ниндзя!</p>
+                </div>
+                <div class="position-absolute bottom-0 start-0 p-3"> <!-- Абсолютное позиционирование -->
+                  <a href="/ninja-run/" class="btn btn-primary">Играть</a>
+                </div>
+              </div>
             </div>
           </div>
-
         </div>
       </div>
     </div>
@@ -176,7 +198,7 @@
   <!-- Раздел 'Об авторе' -->
   <section id="about">
     <h1 style="color:#333;">Об авторе</h1>
-    <p>Проект разработан Иваном Петровым. Мне нравится создавать интересные приложения и делиться ими с окружающими.</p>
+    <p>Проект разработан Ивановым Иваном Ивановичем. Мне нравится создавать интересные приложения и делиться ими с окружающими.</p>
   </section>
 
 </div>

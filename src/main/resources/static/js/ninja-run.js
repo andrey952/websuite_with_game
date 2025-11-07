@@ -8,54 +8,92 @@ document.addEventListener("DOMContentLoaded", () => {
         points: 0
     };
 
-    // Размеры черепашки
     const HERO_WIDTH = 50;
     const HERO_HEIGHT = 50;
 
-    // Определение начальной позиции
     let heroX = canvas.width / 2 - HERO_WIDTH / 2;
     let heroY = canvas.height - HERO_HEIGHT;
 
-    // Объект для управления скоростью
     let speed = 5;
 
-    // Очистка холста
+    // координаты препятствия
+    let obstacleX = canvas.width + 50;
+    const OBSTACLE_WIDTH = 30;
+    const OBSTACLE_HEIGHT = 30;
+
+    window.addEventListener('keydown', event => {
+        switch(event.keyCode) {
+            case 37: // левая стрелка
+                heroX -= speed;
+                break;
+            case 38: // верхняя стрелка
+                handleJump();
+                break;
+            case 39: // правая стрелка
+                heroX += speed;
+                break;
+            default:
+                break;
+        }
+    });
+
     function clearCanvas() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
     }
 
-    // Прорисовка героя
     function drawHero() {
-        ctx.fillStyle = "#00BFFF"; // Голубой цвет для черепашки
+        ctx.fillStyle = "#00BFFF";
         ctx.fillRect(heroX, heroY, HERO_WIDTH, HERO_HEIGHT);
     }
 
-    // Прыжок
+    function drawObstacle() {
+        ctx.fillStyle = '#FF0000';
+        ctx.fillRect(obstacleX, canvas.height - OBSTACLE_HEIGHT, OBSTACLE_WIDTH, OBSTACLE_HEIGHT);
+    }
+
     function handleJump() {
         if (heroY === canvas.height - HERO_HEIGHT) {
-            heroY -= 100; // Выполняем прыжок
+            heroY -= 100;
             setTimeout(() => {
-                heroY = canvas.height - HERO_HEIGHT; // Возвращаемся обратно
-            }, 500); // Длительность прыжка
+                heroY = canvas.height - HERO_HEIGHT;
+            }, 500);
         }
     }
 
-    // Обработчик начала игры
+    function moveObstacle() {
+        obstacleX -= speed;
+        if (obstacleX < -OBSTACLE_WIDTH) {
+            obstacleX = canvas.width + 50;
+        }
+    }
+
+    function checkCollision() {
+        return (
+        heroX < obstacleX + OBSTACLE_WIDTH &&
+        heroX + HERO_WIDTH > obstacleX &&
+        heroY < canvas.height - OBSTACLE_HEIGHT &&
+        heroY + HERO_HEIGHT > canvas.height - OBSTACLE_HEIGHT
+        );
+    }
+
     document.getElementById('startBtn').addEventListener('click', () => {
         gameState.running = true;
         animate();
     });
 
-    // Обработчик прыжка
     document.getElementById('jumpBtn').addEventListener('click', handleJump);
 
-    // Основной цикл анимации
     function animate() {
         clearCanvas();
         drawHero();
+        drawObstacle();
+        moveObstacle();
+        if (checkCollision()) {
+            alert('Игра закончена!');
+            gameState.running = false;
+        }
         if (gameState.running) requestAnimationFrame(animate);
     }
 
-    // Начало игры
     animate();
 });
