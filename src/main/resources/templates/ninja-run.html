@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Черепашки-ниндзя: бегун</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #4CAF50; /* светлый зелёный фон */
+            margin: 0;
+            padding: 0;
+        }
+
+        .central-area {
+            width: 90%;
+            height: calc(100vh - 60px);
+            background-color: #ffffff;
+            padding: 20px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            margin-top: 60px;
+        }
+
+        .welcome-message {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            color: #ffffff; /* белый цвет текста */
+            font-weight: bold;
+        }
+
+        #gameCanvas {
+            display: block;
+            margin: 0 auto;
+            border: 1px solid #ccc;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
+            background-image: linear-gradient(to bottom, #8BC34A, #CDDC39); /* красивый зеленый градиент */
+        }
+
+        #controls button {
+            padding: 10px 20px;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: white;
+            background-color: #2196F3; /* синий цвет кнопок */
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease-in-out;
+        }
+
+        #controls button:hover {
+            background-color: #1976D2;
+        }
+
+        /* Верхняя панель */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background-color: #2ECC71;
+            color: white;
+            padding: 10px 0;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .tab-button {
+            flex-grow: 1;
+            text-align: center;
+            padding: 10px 20px;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease-in-out;
+            color: white;
+            font-weight: bold;
+            letter-spacing: 1px;
+            background-color: inherit;
+        }
+
+        .tab-button.active,
+        .tab-button:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        section {
+            display: none;
+            padding: 20px;
+            animation: fadeIn 0.5s forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+        }
+
+        section.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Верхняя панель -->
+<nav>
+    <button class="tab-button active" onclick="showSection('home')">Главная</button>
+    <button class="tab-button" onclick="showSection('about')">Об авторе</button>
+</nav>
+
+<!-- Центральная область -->
+<div class="central-area">
+    <!-- Кнопка назад -->
+    <a href="/" class="btn btn-secondary mb-3">Назад</a>
+    <!-- Раздел 'Основная страница игры' -->
+    <section id="home" class="active">
+        <div class="container d-flex flex-column align-items-center">
+            <h1 class="mb-4">Игра "Ninja-run"</h1>
+            <div class="row justify-content-center">
+                <div class="col-md-12">
+
+                    <!-- Приветственный текст -->
+                    <div class="welcome-message text-center mb-4">
+                        Добро пожаловать в приключение!<br />
+                        Покажите свое мастерство и соберите как можно больше очков!
+                    </div>
+
+                    <!-- Графический элемент игры -->
+                    <canvas id="gameCanvas" width="800" height="400" class="mx-auto"></canvas>
+
+                    <!-- Контроль -->
+                    <div id="controls" class="d-flex justify-content-center my-4">
+                        <button id="startBtn" class="btn btn-success me-3">Начать игру</button>
+                        <button id="jumpBtn" class="btn btn-warning ms-3">Прыгнуть</button>
+                    </div>
+
+                    <!-- Вывод текущего счета и уровня -->
+                    <div id="game-status" class="text-center">
+                        Уровень: <span id="level">1</span>,  
+                        Баллы: <span id="score">0</span>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Раздел 'Об авторе' -->
+    <section id="about">
+        <h1 style="color:#333;">Об авторе</h1>
+        <p>Проект разработан Иваном Петровым. Мне нравится создавать интересные приложения и делиться ими с окружающими.</p>
+    </section>
+
+</div>
+
+<script>
+    // Функция для показа нужной секции и скрытия остальных
+    function showSection(sectionId) {
+        // Получаем все кнопки и секции
+        const buttons = document.querySelectorAll('.tab-button');
+        const sections = document.querySelectorAll('section');
+
+        // Удаляем класс active у всех кнопок и секций
+        buttons.forEach(button => button.classList.remove('active'));
+        sections.forEach(sec => sec.classList.remove('active'));
+
+        // Активируем выбранную кнопку и соответствующую ей секцию
+        document.getElementById(sectionId).classList.add('active');
+        document.querySelector(`button[onclick*="${sectionId}"]`).classList.add('active');
+    }
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let gameState = {
+            running: false,
+            level: 1,
+            points: 0
+        };
+
+        const HERO_WIDTH = 50;
+        const HERO_HEIGHT = 50;
+
+        let heroX = canvas.width / 2 - HERO_WIDTH / 2;
+        let heroY = canvas.height - HERO_HEIGHT;
+
+        let speed = 3;
+
+        // Координаты препятствия
+        let obstacleX = canvas.width + 50;
+        const OBSTACLE_WIDTH = 30;
+        const OBSTACLE_HEIGHT = 30;
+
+        // Функция очистки холста
+        function clearCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        // Функция рисования героя
+        function drawHero() {
+            ctx.fillStyle = "#00BFFF";
+            ctx.fillRect(heroX, heroY, HERO_WIDTH, HERO_HEIGHT);
+        }
+
+        // Функция рисования препятствия
+        function drawObstacle() {
+            ctx.fillStyle = '#FF0000';
+            ctx.fillRect(obstacleX, canvas.height - OBSTACLE_HEIGHT, OBSTACLE_WIDTH, OBSTACLE_HEIGHT);
+        }
+
+        // Функциональность прыжка
+        function handleJump() {
+            if (heroY === canvas.height - HERO_HEIGHT) {
+                heroY -= 100;
+                setTimeout(() => {
+                    heroY = canvas.height - HERO_HEIGHT;
+                }, 500);
+            }
+        }
+
+        // Перемещение препятствия
+        function moveObstacle() {
+            obstacleX -= speed;
+            if (obstacleX < -OBSTACLE_WIDTH) {
+                obstacleX = canvas.width + 50;
+            }
+        }
+
+        // Проверка столкновений
+        function checkCollision() {
+            return (
+            heroX < obstacleX + OBSTACLE_WIDTH &&
+            heroX + HERO_WIDTH > obstacleX &&
+            heroY < canvas.height - OBSTACLE_HEIGHT &&
+            heroY + HERO_HEIGHT > canvas.height - OBSTACLE_HEIGHT
+            );
+        }
+
+        // Основная анимационная петля
+        function animate() {
+            clearCanvas();
+            drawHero();
+            drawObstacle();
+            moveObstacle();
+            if (checkCollision()) {
+                alert('Вы проиграли! Нажмите "Начать игру", чтобы попробовать заново.');
+                resetGame();
+                return;
+            }
+            if (gameState.running) requestAnimationFrame(animate);
+        }
+
+        // Кнопка старта игры
+        document.getElementById('startBtn').addEventListener('click', () => {
+            resetGame();
+            gameState.running = true;
+            animate();
+        });
+
+        // Кнопка прыжка
+        document.getElementById('jumpBtn').addEventListener('click', handleJump);
+
+        // Функция сброса игры
+        function resetGame() {
+            gameState.points = 0;
+            gameState.level = 1;
+            heroX = canvas.width / 2 - HERO_WIDTH / 2;
+            heroY = canvas.height - HERO_HEIGHT;
+            obstacleX = canvas.width + 50;
+            gameState.running = false;
+            document.querySelector('#score').innerText = gameState.points;
+            document.querySelector('#level').innerText = gameState.level;
+        }
+
+        // Запуск игры
+        resetGame();
+    });
+</script>
+
+</body>
+</html>
