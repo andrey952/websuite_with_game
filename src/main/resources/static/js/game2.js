@@ -99,6 +99,7 @@ function update() {
         if (Phaser.Input.Keyboard.JustDown(rKey)) {
             this.handleRestart();
             gameOver = false;
+            score = 0;
         }
         return; // Выходим, не выполняя остальную логику
     }
